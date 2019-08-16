@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>系统管理人员 - {$Spt.CONFIG.SITE.NAME}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <base href="{$Spt.adminUrl}/"/>
+    <script language="JavaScript" src="/static/admin/layui_common.js"></script>
+</head>
+<body>
+<div class="layui-fluid">
+    {eq name="action" value="index"}
+    <div class="layui-card">
+        <script type="text/html" id="toolbar">
+            <div class="layui-form" lay-filter="frmSearch">
+                <button class="layui-btn" lay-event="add"><i class="layui-icon layui-icon-add-1"></i>添加</button>
+                <button class="layui-btn" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>修改</button>
+                <button class="layui-btn" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</button>
+                {include file="../Public/right-search"/}
+            </div>
+        </script>
+        <div class="layui-card-body">
+            <table lay-data="{height:'full-50',limit:20,limits:[20,40,80,120],url:'{$Spt.config.URL}/list',page:true,toolbar:'#toolbar',method:'post'}" class="layui-table" id="frmList" lay-filter="frmList">
+                <thead>
+                <tr>
+                    <th lay-data="{checkbox:true}"></th>
+                    <th lay-data="{field:'id',width:80}">ID</th>
+                    <th lay-data="{field:'user_name'}">用户名</th>
+                    <th lay-data="{field:'real_name'}">真实姓名</th>
+                    <th lay-data="{field:'email'}">邮箱</th>
+                    <th lay-data="{field:'face',width:80,templet:faceTpl}">头像</th>
+                    <th lay-data="{field:'name'}">用户组</th>
+                    <th lay-data="{field:'status',width:80,templet:statusTpl}">状态</th>
+                    <th lay-data="{field:'login_time'}">登录时间</th>
+                    <th lay-data="{field:'login_ip'}">登录IP</th>
+                    <th lay-data="{field:'login_count'}">登录次数</th>
+                    <th lay-data="{field:'add_time'}">添加时间</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <script type="text/html" id="statusTpl">
+        {{#  if(d.status == 1){ }}
+        <button class="layui-btn layui-btn-xs">正常</button>
+        {{#  } else { }}
+        <button class="layui-btn layui-btn-primary layui-btn-xs">锁定</button>
+        {{#  } }}
+    </script>
+    <script type="text/html" id="faceTpl">
+        <img onclick="preview(this.src);" style="cursor:pointer;display:inline-block;width:100%;height:100%;" src='{$Spt.attachUrl}{{ d.face }}' />
+    </script>
+    <script language="JavaScript">
+        layui.use(['table','form','laypage'],function(){tableRender('{$Spt.config.URL}');});
+        function preview(imgUrl){
+            layui.layer.photos({
+                photos:{
+                    title:"查看图片",
+                    data:[{src:imgUrl}]
+                },shade:.01,closeBtn:1,anim:5
+            })
+        }
+    </script>
+    {/eq}
+
+    {eq name="action" value="add||edit||view"}
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form layui-form-pane">
+                <input type="hidden" name="id" value="{$info.id}"/>
+                <textarea name="user_menu" id="user_menu" style="display: none">{$info.user_menu}</textarea>
+                <textarea name="user_power" id="user_power" style="display: none">{$info.user_power}</textarea>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="user_name" lay-verify="required" value="{$info.user_name}" autocomplete="off" class="layui-input" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">真实姓名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="real_name" lay-verify="required" value="{$info.real_name}" autocomplete="off" class="layui-input" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">邮箱</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="email" lay-verify="email" value="{$info.email}" autocomplete="off" class="layui-input" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">登录密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" name="pass_word" autocomplete="off" class="layui-input" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">确认密码</label>
+                    <div class="layui-input-block">
+                        <input type="password" name="re_pass_word" autocomplete="off" class="layui-input" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">权限组所属</label>
+                    <div class="layui-input-block">
+                        <select name="group_id" id="group_id" lay-verify="required" class="layui-input"></select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">额外权限</label>
+                    <div class="layui-input-block">
+                        <button class="layui-btn layui-btn-primary" id="selectPower">选择额外权限</button>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <select name="status" lay-verify="required">
+                            <option value="1" {eq name="info.status" value="1"} selected {/eq}>有效</option>
+                            <option value="2" {eq name="info.status" value="2"} selected {/eq}>无效</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="frmSubmit">提交保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script language="JavaScript">
+        layui.use('form', function(){
+            reSizeFrame();
+            createOption("Admin/userGroup/select.html", "#group_id", "{$info.group_id}");
+            layui.form.on('submit(frmSubmit)', function(obj){
+                saveForm('Admin/users/save.html',obj.field,null,(json)=>{json.code===0&&refreshTable();});
+            });
+            layui.jquery('#selectPower').click(function () {
+                alert('');
+            });
+        });
+    </script>
+    {/eq}
+</div>
+</body>
+</html>

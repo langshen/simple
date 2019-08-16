@@ -1,0 +1,20 @@
+<div class="layui-hide-xs" style="float:right;">
+    <div class="layui-inline" style="width: 150px;">
+        <select name="search_type" lay-verify="required">
+            {volist name="search_type" id="vo"}<option value="{$vo.id}">{$vo.text}</option>{/volist}
+        </select>
+    </div>
+    <div class="layui-inline" style="width: 80px;">
+        <select name="search_symbol" lay-verify="required">
+            {volist name="search_symbol" id="vo"}<option value="{$vo.id}">{$vo.text}</option>{/volist}
+        </select>
+    </div>
+    <div class="layui-inline" style="width: 150px;">
+        <input type="text" name="search_key" lay-verify="required" value="{$search_key}" placeholder="请输入搜索内容" autocomplete="off" class="layui-input" />
+    </div>
+    <div class="layui-inline">
+        <button class="layui-btn" lay-submit lay-filter="search">
+            <i class="layui-icon layui-icon-search layuiadmin-button-btn"> </i>搜索
+        </button>
+    </div>
+</div>

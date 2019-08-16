@@ -1,0 +1,57 @@
+#location / {
+#   try_files $uri $uri/ /index.php?$query_string;
+#}
+#以上是Nginx的重写正则
+
+server {
+    listen 80;
+
+    server_name www.qz98.net;
+    root /data/wwwroot;
+
+    index index.php index.html index.htm index.nginx-debian.html;
+    location / {
+       try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php7.1-fpm.sock;
+    }
+}
+
+server {
+    listen 80;
+    server_name nengban.net www.nengban.net;
+    rewrite ^(.*)$ https://www.nengban.net$1 permanent;
+}
+server {
+    listen 443 ssl;
+    ssl_certificate cert/nengban.net/1703477_nengban.net.pem;
+    ssl_certificate_key cert/nengban.net/1703477_nengban.net.key;
+    server_name nengban.net;
+    rewrite ^(.*)$ https://www.nengban.net$1 permanent;
+}
+server {
+    listen 443;
+    server_name www.nengban.net;
+    ssl on;
+    root /data/project/trade/wwwroot;
+
+    index index.php index.html index.htm;
+    ssl_certificate   cert/nengban.net/1703351_www.nengban.net.pem;
+    ssl_certificate_key  cert/nengban.net/1703351_www.nengban.net.key;
+    ssl_session_timeout 5m;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    location / {
+        client_max_body_size 5m;
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+    }
+
+}
+

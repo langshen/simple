@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>忘记密码 - {$Spt.config.SITE.NAME}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <base href="{$Spt.adminUrl}/"/>
+    <link rel="stylesheet" href="/static/admin/lay-admin/css/login.css" media="all">
+    <script language="JavaScript" src="/static/admin/layui_common.js"></script>
+</head>
+<body>
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+    <div class="layadmin-user-login-main">
+        <div class="layadmin-user-login-box layadmin-user-login-header">
+            <h2>Admin后台管理</h2>
+        </div>
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-user_name"></label>
+                <input type="text" name="user_name" id="LAY-user-login-user_name" lay-verify="required" placeholder="用户名" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-chat" for="LAY-user-login-email"></label>
+                <input type="text" name="email" id="LAY-user-login-email" lay-verify="email" placeholder="请输入注册时的邮箱" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-row">
+                    <div class="layui-col-xs7">
+                        <label class="layadmin-user-login-icon layui-icon layui-icon-vercode" for="LAY-user-login-email_code"></label>
+                        <input type="text" name="email_code" id="LAY-user-login-email_code" lay-verify="required" placeholder="邮箱验证码" class="layui-input">
+                    </div>
+                    <div class="layui-col-xs5">
+                        <div style="margin-left: 10px;">
+                            <button type="button" class="layui-btn layui-btn-primary layui-btn-fluid" id="LAY-user-getsmscode">获取验证码</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-row">
+                    <div class="layui-col-xs7">
+                        <label class="layadmin-user-login-icon layui-icon layui-icon-vercode" for="LAY-user-login-vercode"></label>
+                        <input type="text" name="ver_code" id="LAY-user-login-vercode" lay-verify="required" placeholder="图形验证码" class="layui-input">
+                    </div>
+                    <div class="layui-col-xs5">
+                        <div style="margin-left: 10px;">
+                            <img src="index/code.html" class="layadmin-user-login-codeimg" id="LAY-user-get-vercode" onclick="showCode('LAY-user-get-vercode')" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-forget-submit">找回密码</button>
+            </div>
+            <div class="layui-trans layui-form-item layadmin-user-login-other" style="padding-top:0;">
+                <a href="index/login.html" class="layadmin-user-jump-change layadmin-link">用已有帐号登入</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-trans layadmin-user-login-footer">
+        <p>© 2018 <a href="{$Spt.wwwUrl}" target="_blank">{$Spt.wwwUrl}</a></p>
+    </div>
+
+</div>
+<script language="JavaScript">
+    layui.use(['form'], function(){
+        layui.form.render();
+        layui.jquery('#LAY-user-getsmscode').click(function(){
+            layui.jquery('#LAY-user-login-email_code').val('');
+            layui.jquery('#LAY-user-login-email_code').focus();
+            let userName = layui.jquery('#LAY-user-login-user_name').val();
+            let email = layui.jquery('#LAY-user-login-email').val();
+            if (userName.length < 2){
+                layui.jquery('#LAY-user-login-user_name').focus();
+                return layer.msg('请输入用户名。',{icon: 2});
+            }
+            if (email.length < 5 || !(email.indexOf('.')>0 && email.indexOf('@')>0)){
+                layui.jquery('#LAY-user-login-email').focus();
+                return layer.msg('请输入邮箱。',{icon: 2});
+            }
+            layui.form.verify();
+            layui.jquery('#LAY-user-getsmscode').attr('disabled','disabled');
+            saveForm('Queue/email.html',{user_name:userName,send_to:email,tpl_key:'admin_lost_pwd'},function(json){
+                layer.msg(json.msg, {icon: json.code === 0?1:2,time: 3000});
+                if (json.code === 0){
+                    setTime(layui.jquery('#LAY-user-getsmscode'));
+                }else{
+                    layui.jquery('#LAY-user-getsmscode').removeAttr('disabled');
+                }
+            });
+        });
+        //点击提交
+        layui.form.on('submit(LAY-user-forget-submit)', function(obj){
+            saveForm('index/lost/save.html',obj.field,function(json){
+                layer.msg(json.msg, {icon: json.code === 0?1:2,time: 3000});
+                if (json.code === 0){
+                    window.location.href = 'index/edit.html'
+                }else{
+                    if (json.msg.indexOf('验证码')>=0){
+                        showCode('LAY-user-get-vercode');
+                        layui.jquery('#LAY-user-login-vercode').select();
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>
